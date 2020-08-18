@@ -1,4 +1,7 @@
 import re
+import chess
+
+import data
 
 """
 Data processing:
@@ -15,26 +18,30 @@ Ideas:
 responsibilities, threats, etc. would be better
 """
 
+NAME = "Desmond_Wilson"
+
 if __name__ == "__main__":
-    with open("lichess_db_standard_rated_2013-01.pgn", "r") as f:
+    with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
+        training_set = []
+        labls = []
+
         games = []
 
-        save = False
         while True:
-            line = f.readline()
+            game = chess.pgn.read_game(pgn)
 
-            if line == "": # EOF
-                break
+            if game.headers["White"] == NAME or game.headers["Black"] == NAME:
+                games.append(game)
 
-            if line[:22] == "[Black \"Desmond_Wilson" or line[:22] == "[White \"Desmond_Wilson":
-                save = True
-            elif line[0] == "1" and save:
-                games.append(line)
-                save = False
+        for game in games:
+            board = game.board()
 
-        # Matches the numbers denoting the start of a new turn, and the ending
-        # game result
-        ptrn = re.compile(" ?\d+\. | 0-1| 1-0| 1/2-1/2")
-        games = tuple(tuple(turn.split(" ") for turn in ptrn.split(game))[1:-1] for game in games)
+            skip = False if game.headers["White"] == Name else True
+            for move in game.mainline_moves():
+                # Only consider the positions where our player had to make a move
+                if skip:
+                    skip = False
+                    continue
 
-        print(games[0])
+                training_set.append(data.create_input_tensor(board.fen()))
+                labels.append(data.create_output_tensor(move))
