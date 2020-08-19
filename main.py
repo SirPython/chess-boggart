@@ -2,6 +2,7 @@ import re
 import chess.pgn
 import chess
 import numpy as np
+import csv
 
 import data
 
@@ -23,17 +24,17 @@ responsibilities, threats, etc. would be better
 NAME = "Desmond_Wilson"
 
 if __name__ == "__main__":
-    b = chess.Board()
-    output = data.encode_output(b, chess.Move.from_uci("d2d4"))
-    print(output, np.argmax(output))
-    """with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
+    with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
         training_set = []
-        labls = []
+        labels = []
 
         games = []
 
         while True:
             game = chess.pgn.read_game(pgn)
+
+            if game == None:
+                break
 
             if game.headers["White"] == NAME or game.headers["Black"] == NAME:
                 games.append(game)
@@ -41,12 +42,17 @@ if __name__ == "__main__":
         for game in games:
             board = game.board()
 
-            skip = False if game.headers["White"] == Name else True
+            skip = False if game.headers["White"] == NAME else True
             for move in game.mainline_moves():
                 # Only consider the positions where our player had to make a move
                 if skip:
                     skip = False
                     continue
+                skip = True
 
-                training_set.append(data.encode_intput(board.fen()))
-                labels.append(data.encode_output(board, move))"""
+                training_set.append(data.encode_input(board.fen()))
+                labels.append(data.encode_output(board, move))
+
+                board.push(move)
+
+        print(len(training_set))

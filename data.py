@@ -42,6 +42,8 @@ def encode_output(board, move):
     tensor = np.zeros(2048) # It actually comes out to this. Crazy.
 
     mover = board.piece_type_at(move.from_square)
+
+    print("mover", mover)
     if mover == 1: # Pawns
         """
         index = (
