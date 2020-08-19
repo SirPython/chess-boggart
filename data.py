@@ -43,6 +43,7 @@ def encode_output(board, move):
 
     mover = board.piece_type_at(move.from_square)
     if mover == 1: # Pawns
+        """
         index = (
             5    # 5 pieces besides pawn (they own the first realestate in the encoding)
             * 64 # 64 squares to move
@@ -59,7 +60,10 @@ def encode_output(board, move):
         + (
             move.promotion if move.promotion else 0
         )
-    else: # Every otehr piece
+        """
+        index = 640 + (move.to_square * 12) + (6 if move.drop is not None else 0) + (move.promotion or 0)
+    else: # Every other piece
+        """
         index = (
             (mover - 2) # Pawns are 1, so this 0 indexes the pieces starting with knights
             * 64        # 64 squares
@@ -72,7 +76,8 @@ def encode_output(board, move):
         + (
             1 if move.drop is not None else 0
         )
-
+        """
+        index = ((mover - 2) * 128) + (move.to_square * 2) + (1 if move.drop is not None else 0)
 
     tensor[index] = 1
     return tensor

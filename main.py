@@ -1,6 +1,7 @@
 import re
 import chess.pgn
 import chess
+import numpy as np
 
 import data
 
@@ -23,8 +24,8 @@ NAME = "Desmond_Wilson"
 
 if __name__ == "__main__":
     b = chess.Board()
-    output = data.encode_output(b, chess.Move.from_uci("e2e4"))
-    print(output, output.index(1))
+    output = data.encode_output(b, chess.Move.from_uci("d2d4"))
+    print(output, np.argmax(output))
     """with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
         training_set = []
         labls = []
