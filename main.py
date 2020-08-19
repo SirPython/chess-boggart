@@ -1,4 +1,5 @@
 import re
+import chess.pgn
 import chess
 
 import data
@@ -21,7 +22,10 @@ responsibilities, threats, etc. would be better
 NAME = "Desmond_Wilson"
 
 if __name__ == "__main__":
-    with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
+    b = chess.Board()
+    output = data.encode_output(b, chess.Move.from_uci("e2e4"))
+    print(output, output.index(1))
+    """with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
         training_set = []
         labls = []
 
@@ -43,5 +47,5 @@ if __name__ == "__main__":
                     skip = False
                     continue
 
-                training_set.append(data.create_input_tensor(board.fen()))
-                labels.append(data.create_output_tensor(move))
+                training_set.append(data.encode_intput(board.fen()))
+                labels.append(data.encode_output(board, move))"""
