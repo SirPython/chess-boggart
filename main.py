@@ -3,6 +3,7 @@ import chess.pgn
 import chess
 import numpy as np
 import csv
+from tensorflow.keras import models, layers
 
 import data
 
@@ -55,4 +56,17 @@ if __name__ == "__main__":
 
                 board.push(move)
 
-        print(len(training_set))
+        model = models.Sequential()
+        model.add(layers.Dense(64, activation="relu", input_shape=(len(training_set), )))
+        model.add(layers.Dense(64, activation="relu"))
+        model.add(layers.Dense(64, activation="softmax"))
+
+        model.compile(
+            optimizer="rmsprop",
+            loss="categorical_crossentropy",
+            metrics=["accuracy"]
+        )
+
+        model.fit(training_set, labels, epochs=5, batch_size=512)
+
+        model.save("model.h5")
