@@ -4,6 +4,8 @@ import chess
 import numpy as np
 import csv
 from tensorflow.keras import models, layers
+import sys
+import os
 
 import data
 
@@ -25,29 +27,30 @@ responsibilities, threats, etc. would be better
 NAME = "Desmond_Wilson"
 
 if __name__ == "__main__":
-    with open("lichess_db_standard_rated_2013-01.pgn", "r") as pgn:
+    if sys.argv[1] == "load_games":
+        with open(sys.argv[2], "r") as pgn:
+            while (game := chess.pgn.read_game(pgn)) != None:
+                if game.headers["White"] == sys.argv[3] or game.headers["Black"] == sys.argv[3]:
+                    print(game, file=open(sys.argv[4], "a"), end="\n\n")
+                    # TODO: Save in a python file and let pycache take it
+    elif sys.argv[1] == "train_model":
         training_set = []
         labels = []
-
         games = []
 
-        while True:
-            game = chess.pgn.read_game(pgn)
-
-            if game == None:
-                break
-
-            if game.headers["White"] == NAME or game.headers["Black"] == NAME:
+        with open(sys.argv[2], "r") as pgn:
+            while (game := chess.pgn.read_game(pgn)) != None:
                 games.append(game)
 
         for game in games:
             board = game.board()
 
-            skip = False if game.headers["White"] == NAME else True
+            skip = False if game.headers["White"] == sys.argv[3] else True
             for move in game.mainline_moves():
                 # Only consider the positions where our player had to make a move
                 if skip:
                     skip = False
+                    board.push(move)
                     continue
                 skip = True
 
@@ -56,10 +59,16 @@ if __name__ == "__main__":
 
                 board.push(move)
 
+        print(len(training_set))
+
+        #print(len(training_set), len(labels))
+        training_set = np.array(training_set)
+        labels = np.array(labels)
+
         model = models.Sequential()
-        model.add(layers.Dense(64, activation="relu", input_shape=(len(training_set), )))
+        model.add(layers.Dense(64, activation="relu", input_shape=(8 * 8 * 12,)))
         model.add(layers.Dense(64, activation="relu"))
-        model.add(layers.Dense(64, activation="softmax"))
+        model.add(layers.Dense(2048, activation="softmax"))
 
         model.compile(
             optimizer="rmsprop",
@@ -67,6 +76,33 @@ if __name__ == "__main__":
             metrics=["accuracy"]
         )
 
-        model.fit(training_set, labels, epochs=5, batch_size=512)
+        model.fit(training_set, labels, epochs=50, batch_size=16)
+
+        model.predict(training_set[0])
 
         model.save("model.h5")
+
+    elif sys.argv[1] == "play":
+        model = models.load_model(sys.argv[2])
+
+        board = chess.Board()
+        while True:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(board)
+
+            player_move = input("Enter move:")
+            board.push_san(player_move)
+
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(board)
+
+            bot_move = data.encode_input(board.fen()).shape
+            print(bot_move)
+            bot_move = model.predict(data.encode_input(board.fen()), verbose=1)
+            print(bot_move)
+
+            input("hold")
+
+
+    else:
+        print("You need a command buddy")

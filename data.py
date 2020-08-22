@@ -1,8 +1,8 @@
 import numpy as np
 
 def encode_input(fen):
-    tensor = [[[0] * 12] * 8] * 8
-    tensor = np.zeros((8,8,12), np.int8)
+    #tensor = np.zeros((8,8,12), dtype=np.int8)
+    tensor = np.zeros(8 * 8 * 12, dtype=np.int8)
     coord = [0, 0]
     pieces = "KQRBNPkqrbnp"
 
@@ -11,7 +11,8 @@ def encode_input(fen):
             if square.isdigit():
                 coord[1] += int(square)
             else:
-                tensor[coord[0]][coord[1]][pieces.index(square)] = 1
+                #tensor[coord[0]][coord[1]][pieces.index(square)] = 1
+                tensor[(coord[0] * 8) + (coord[1] * 8) + pieces.index(square)] = 1
 
                 coord[1] += 1
 
@@ -39,11 +40,10 @@ So 36 * 2 + 8 * 2 * 5
 """
 def encode_output(board, move):
     # TODO If this will work with bits intead...
-    tensor = np.zeros(2048) # It actually comes out to this. Crazy.
+    tensor = np.zeros(2048, dtype=np.int8) # It actually comes out to this. Crazy.
 
     mover = board.piece_type_at(move.from_square)
 
-    print("mover", mover)
     if mover == 1: # Pawns
         """
         index = (
