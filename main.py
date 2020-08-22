@@ -86,17 +86,15 @@ if __name__ == "__main__":
             os.system('cls' if os.name == 'nt' else 'clear')
             print(board)
 
-            bot_move = decode_output(
+            bot_move = data.decode_output(
                 model.predict(
                     np.array(
                         [data.encode_input(board.fen())]
                     )
-                ),
+                )[0],
                 board
             )
             board.push(bot_move)
-
-            input("hold")
 
     elif sys.argv[1] == "test":
         move = np.zeros(64 * 64)

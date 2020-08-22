@@ -32,8 +32,10 @@ def encode_output(board, move):
     return tensor
 
 def decode_output(tensor, board):
+    print(len(tensor))
     while True:
         move_id = np.argmax(tensor)
+        print(len(tensor))
 
         from_square = floor(move_id / 64)
         to_square = move_id - (from_square * 64)
@@ -47,4 +49,5 @@ def decode_output(tensor, board):
         if move in board.legal_moves:
             return move
         else:
+            print(move_id, len(tensor))
             tensor[move_id] = 0
