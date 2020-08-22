@@ -4,3 +4,5 @@ Ideas:
 responsibilities, threats, etc. would be better
 - For the current iteration, have it study players that are good at positional
 chess
+
+New goal: the strongest AI that doesn't calculate

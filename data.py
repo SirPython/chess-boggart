@@ -24,6 +24,21 @@ def encode_input(fen):
 
     return tensor
 
+    """
+    Piece responsibility:
+    - friendly or not piece: 2
+    - type of piece: 6
+    - piece proximity to own king
+    - piece proximity to other king
+    - type of responsibility: controlling or blocking: 2
+    - other piece friendly or not: 2
+    - other piece type: 6
+    - other piece proxs
+    - maybe how many moves it'd take to navigate to x square?
+
+    
+
+    """
 
 def encode_output(board, move):
     tensor = np.zeros(64 * 64, dtype=np.int8)
