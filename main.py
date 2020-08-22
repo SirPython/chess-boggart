@@ -30,6 +30,7 @@ if __name__ == "__main__":
                 if game.headers["White"] == sys.argv[3] or game.headers["Black"] == sys.argv[3]:
                     print(game, file=open(sys.argv[4], "a"), end="\n\n")
                     # TODO: Save in a python file and let pycache take it
+
     elif sys.argv[1] == "train_model":
         training_set = []
         labels = []
@@ -54,16 +55,13 @@ if __name__ == "__main__":
 
                 board.push(move)
 
-        print(len(training_set))
-
-        #print(len(training_set), len(labels))
         training_set = np.array(training_set)
         labels = np.array(labels)
 
         model = models.Sequential()
         model.add(layers.Dense(64, activation="relu", input_shape=(8 * 8 * 12,)))
         model.add(layers.Dense(64, activation="relu"))
-        model.add(layers.Dense(2048, activation="softmax"))
+        model.add(layers.Dense(64 * 64, activation="softmax"))
 
         model.compile(
             optimizer="rmsprop",
@@ -72,9 +70,6 @@ if __name__ == "__main__":
         )
 
         model.fit(training_set, labels, epochs=50, batch_size=16)
-
-        #model.predict(training_set[0])
-
         model.save("model.h5")
 
     elif sys.argv[1] == "play":
@@ -104,13 +99,17 @@ if __name__ == "__main__":
             input("hold")
 
     elif sys.argv[1] == "test":
-        move = np.zeros(2048)
-        move[444] = 1
+        move = np.zeros(64 * 64)
+        move[2444] = 1
 
+        move = chess.Move.from_uci("e2e4")
         board = chess.Board()
+        print(move.uci())
 
-        data.decode_output(move, board)
-        print(board.piece_type_at(chess.D1))
+        move = data.encode_output(board, move)
+        move = data.decode_output(move, board)
+
+        print(move.uci())
 
     else:
         print("You need a command buddy")
