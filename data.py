@@ -83,3 +83,13 @@ def encode_output(board, move):
 
     tensor[index] = 1
     return tensor
+
+def decode_output(tensor, board):
+    while True:
+        move_id = np.argmax(tensor)
+
+        if move_id >= 640: # Pawns
+            pass
+
+        else:
+            

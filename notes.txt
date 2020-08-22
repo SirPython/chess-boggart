@@ -1,0 +1,6 @@
+Ideas:
+- Maybe make it learn a player twice: for black and for white
+- Perhaps simply the board state is not good enough for input. Maybe
+responsibilities, threats, etc. would be better
+- For the current iteration, have it study players that are good at positional
+chess

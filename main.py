@@ -18,10 +18,7 @@ Data processing:
 5. Convert the move the user played into the big vector idea thing
 6. Save locally
 
-Ideas:
-- Maybe make it learn a player twice: for black and for white
-- Perhaps simply the board state is not good enough for input. Maybe
-responsibilities, threats, etc. would be better
+
 """
 
 NAME = "Desmond_Wilson"
@@ -45,14 +42,12 @@ if __name__ == "__main__":
         for game in games:
             board = game.board()
 
-            skip = False if game.headers["White"] == sys.argv[3] else True
+            is_white = game.headers["White"] == sys.argv[3]
             for move in game.mainline_moves():
                 # Only consider the positions where our player had to make a move
-                if skip:
-                    skip = False
+                if (board.turn == chess.BLACK and is_white) or (board.turn == chess.WHITE and !is_white):
                     board.push(move)
                     continue
-                skip = True
 
                 training_set.append(data.encode_input(board.fen()))
                 labels.append(data.encode_output(board, move))
@@ -78,7 +73,7 @@ if __name__ == "__main__":
 
         model.fit(training_set, labels, epochs=50, batch_size=16)
 
-        model.predict(training_set[0])
+        #model.predict(training_set[0])
 
         model.save("model.h5")
 
@@ -96,12 +91,47 @@ if __name__ == "__main__":
             os.system('cls' if os.name == 'nt' else 'clear')
             print(board)
 
-            bot_move = data.encode_input(board.fen()).shape
-            print(bot_move)
-            bot_move = model.predict(data.encode_input(board.fen()), verbose=1)
-            print(bot_move)
+            bot_move = decode_output(
+                model.predict(
+                    np.array(
+                        [data.encode_input(board.fen())]
+                    )
+                ),
+                board
+            )
+            board.push(bot_move)
 
             input("hold")
+
+    elif sys.argv[1] == "test":
+        from tensorflow.keras.datasets import mnist
+
+        (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+        model = models.Sequential()
+        model.add(layers.Dense(512, activation="relu", input_shape=(28 * 28,)))
+        model.add(layers.Dense(10, activation="softmax"))
+
+        model.compile(
+            optimizer="rmsprop",
+            loss="categorical_crossentropy",
+            metrics=["accuracy"]
+        )
+
+        train_images = train_images.reshape((60000, 28 * 28))
+        train_images = train_images.astype("float32") / 255
+
+        test_images = test_images.reshape((10000, 28 * 28))
+        test_images = test_images.astype("float32") / 255
+
+        from tensorflow.keras.utils import to_categorical
+
+        train_labels = to_categorical(train_images)
+        test_labels = to_categorical(test_images)
+
+        model.fit(train_images, train_labels, epochs=5, batch_size=128)
+
+        model.predict(test_images[0])
 
 
     else:
