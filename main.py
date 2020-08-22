@@ -45,7 +45,7 @@ if __name__ == "__main__":
             is_white = game.headers["White"] == sys.argv[3]
             for move in game.mainline_moves():
                 # Only consider the positions where our player had to make a move
-                if (board.turn == chess.BLACK and is_white) or (board.turn == chess.WHITE and !is_white):
+                if (board.turn == chess.BLACK and is_white) or (board.turn == chess.WHITE and not is_white):
                     board.push(move)
                     continue
 
@@ -104,35 +104,13 @@ if __name__ == "__main__":
             input("hold")
 
     elif sys.argv[1] == "test":
-        from tensorflow.keras.datasets import mnist
+        move = np.zeros(2048)
+        move[444] = 1
 
-        (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+        board = chess.Board()
 
-        model = models.Sequential()
-        model.add(layers.Dense(512, activation="relu", input_shape=(28 * 28,)))
-        model.add(layers.Dense(10, activation="softmax"))
-
-        model.compile(
-            optimizer="rmsprop",
-            loss="categorical_crossentropy",
-            metrics=["accuracy"]
-        )
-
-        train_images = train_images.reshape((60000, 28 * 28))
-        train_images = train_images.astype("float32") / 255
-
-        test_images = test_images.reshape((10000, 28 * 28))
-        test_images = test_images.astype("float32") / 255
-
-        from tensorflow.keras.utils import to_categorical
-
-        train_labels = to_categorical(train_images)
-        test_labels = to_categorical(test_images)
-
-        model.fit(train_images, train_labels, epochs=5, batch_size=128)
-
-        model.predict(test_images[0])
-
+        data.decode_output(move, board)
+        print(board.piece_type_at(chess.D1))
 
     else:
         print("You need a command buddy")

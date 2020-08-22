@@ -1,3 +1,5 @@
+from math import floor
+
 import numpy as np
 
 def encode_input(fen):
@@ -88,8 +90,27 @@ def decode_output(tensor, board):
     while True:
         move_id = np.argmax(tensor)
 
+        from_square = None
+        to_square = None
+        promotion = None
+        captures = False
+
         if move_id >= 640: # Pawns
             pass
 
         else:
-            
+            # This is why encoding based on the moving piece is dumb.
+            mover = floor(move_id / 128) + 2
+            squares = list(board.pieces(move, board.turn))
+            random.shuffle(squares)
+            for square in squares:
+                from_square = square
+                to_square = floor((move_id - mover) / 2)
+                captures = move_id % 2 != 0
+
+                if board.
+
+        move = chess.Move(from_square, to_square, promotion)
+
+
+        break
